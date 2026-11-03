@@ -1,0 +1,32 @@
+Bài 2: Sự cố phiên làm việc trên hệ thống vận tải
+Phần 1. Phân tích
+1. Nguyên nhân sự cố
+
+Hệ thống đang sử dụng Session Cookies nên khi shipper đóng trình duyệt, Cookie bị xóa. Vì vậy, shipper phải đăng nhập lại và không giữ được trạng thái phiên làm việc.
+
+Cần chuyển sang sử dụng Persistent Cookies để ghi nhớ phiên đăng nhập sau khi đóng trình duyệt.
+
+2. So sánh Cache và Cookies
+- Cache: Có dung lượng lớn, từ MB đến GB, dùng để lưu hình ảnh, CSS, JavaScript giúp website tải nhanh hơn.
+- Cookies: Dung lượng nhỏ, khoảng 4KB mỗi Cookie, dùng để lưu Token đăng nhập và thông tin phiên làm việc.
+=> Cache dùng để tăng tốc độ tải trang, còn Cookies dùng để ghi nhớ trạng thái người dùng.
+
+Phần 2. Triển khai
+Sử dụng Persistent Cookies với cấu hình sau:
+Set-Cookie: session_token=abc123xyz;
+Max-Age=604800;
+Path=/;
+HttpOnly;
+Secure;
+SameSite=Lax
+
+
+Không lưu mật khẩu trực tiếp trong Cookie và cần có cơ chế hết hạn, thu hồi Token để đảm bảo an toàn.
+Phần 3. Kiểm thử
+Nếu shipper thay đổi giao diện nhưng trình duyệt vẫn hiển thị màu cũ, có thể do Cache vẫn lưu phiên bản CSS trước đó.
+
+Cách thực hiện Hard Reload:
+- Bước 1: Mở trang web cần kiểm tra.
+- Bước 2: Nhấn tổ hợp phím Ctrl + Shift + R.
+- Bước 3: Trình duyệt tải lại trang và yêu cầu tải lại các tài nguyên, bỏ qua Cache thông thường.
+- Bước 4: Kiểm tra giao diện đã cập nhật màu mới chưa.
